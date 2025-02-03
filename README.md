@@ -1,5 +1,5 @@
 # Financial Independence Calculators
-A Flask-based web application that helps users plan their financial independence by providing two powerful calculators for investment and retirement planning.
+A Flask-based web application that helps users plan their financial independence by providing two powerful calculators for retirement planning.
 
 ## Features
 - Calculator 1: Determine future investment value based on monthly savings
