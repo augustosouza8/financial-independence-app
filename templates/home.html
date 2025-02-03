@@ -1,0 +1,50 @@
+<!-- templates/home.html -->
+<!--
+Home Page for Financial Independence Calculators.
+Allows users to choose between:
+  - Calculator 1: I already have an idea of how much I can invest each month!
+  - Calculator 2: I just know how much I want to earn monthly in retirement!
+-->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Financial Independence Calculators</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 class="mb-4">Choose Your Calculator</h1>
+      <div class="row">
+        <!-- Calculator 1 Card -->
+        <div class="col-md-6">
+          <div class="card text-center mb-4">
+            <div class="card-body">
+              <h5 class="card-title">Calculator 1: I already have an idea of how much I can invest each month!</h5>
+              <p class="card-text">
+                Enter your monthly investment amount (plus any initial investment, if applicable), and we’ll calculate how much you could earn per month in retirement based on your accumulated investments.
+              </p>
+              <a href="{{ url_for('calculator1_index') }}" class="btn btn-primary">Go to Calculator 1</a>
+            </div>
+          </div>
+        </div>
+        <!-- Calculator 2 Card -->
+        <div class="col-md-6">
+          <div class="card text-center mb-4">
+            <div class="card-body">
+              <h5 class="card-title">Calculator 2: I just know how much I want to earn monthly in retirement!</h5>
+              <p class="card-text">
+                Set your desired monthly retirement income (plus any initial investment, if applicable), and we’ll calculate how much you need to invest each month to reach your goal.
+              </p>
+              <a href="{{ url_for('calculator2_index') }}" class="btn btn-success">Go to Calculator 2</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
