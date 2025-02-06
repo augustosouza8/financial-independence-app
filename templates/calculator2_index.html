@@ -1,9 +1,8 @@
 <!-- templates/calculator2_index.html -->
 <!--
 Input form for Calculator 2: Future Monthly Income Calculator.
-Users enter their target future monthly retirement income, optional initial investment,
+Users enter their target future monthly retirement income, an optional initial investment,
 annual return rate, and safe withdrawal rate.
-Values are pre-filled with defaults or session values.
 -->
 <!doctype html>
 <html lang="en">
@@ -18,7 +17,6 @@ Values are pre-filled with defaults or session values.
     <div class="container mt-5">
       <h1 class="mb-4">Calculator 2: Future Monthly Income Calculator</h1>
 
-      <!-- Flash messages for errors, if any -->
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, message in messages %}
@@ -34,29 +32,29 @@ Values are pre-filled with defaults or session values.
         <div class="mb-3">
           <label for="target_income" class="form-label">Target Future Monthly Retirement Passive Income</label>
           <input type="text" class="form-control" id="target_income" name="target_income" placeholder="" value="{{ target_income }}" required>
-          <div class="form-text">Enter value with dot as thousands separator and comma as decimal separator (e.g., 7.000,00).</div>
+          <div class="form-text">Use dot as thousands separator and comma as decimal separator (e.g., 7.000,00).</div>
         </div>
         <div class="mb-3">
           <label for="initial_investment" class="form-label">Initial Investment (optional)</label>
           <input type="text" class="form-control" id="initial_investment" name="initial_investment" placeholder="" value="{{ initial_investment }}">
-          <div class="form-text">Enter value with dot as thousands separator and comma as decimal separator (e.g., 10.000,00).</div>
+          <div class="form-text">Use dot as thousands separator and comma as decimal separator (e.g., 10.000,00).</div>
         </div>
         <div class="mb-3">
           <label for="annual_rate" class="form-label">Annual Return Rate (%)</label>
           <input type="text" class="form-control" id="annual_rate" name="annual_rate" placeholder="" value="{{ annual_rate }}" required>
-          <div class="form-text">Enter value as a percentage, e.g., 6,00 (must be greater than 0).</div>
+          <div class="form-text">Enter a percentage (e.g., 6,00).</div>
         </div>
         <div class="mb-3">
           <label for="safe_withdrawal_rate" class="form-label">Safe Withdrawal Rate (%)</label>
           <input type="text" class="form-control" id="safe_withdrawal_rate" name="safe_withdrawal_rate" placeholder="" value="{{ safe_withdrawal_rate }}" required>
-          <div class="form-text">Enter value as a percentage, e.g., 4,00 (must be greater than 0).</div>
+          <div class="form-text">Enter a percentage (e.g., 4,00).</div>
         </div>
         <button type="submit" class="btn btn-primary">Calculate</button>
       </form>
 
       <a href="{{ url_for('home') }}" class="btn btn-secondary mt-4">Back to Home</a>
     </div>
-    <!-- Bootstrap JS and dependencies -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

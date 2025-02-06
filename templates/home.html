@@ -1,9 +1,10 @@
 <!-- templates/home.html -->
 <!--
 Home Page for Financial Independence Calculators.
-Allows users to choose between:
-  - Calculator 1: I already have an idea of how much I can invest each month!
-  - Calculator 2: I just know how much I want to earn monthly in retirement!
+Allows the user to choose among:
+  - Calculator 1: User-set Monthly Investment
+  - Calculator 2: User-set Future Monthly Income
+  - Calculator 3: Monthly Savings Potential
 -->
 <!doctype html>
 <html lang="en">
@@ -19,26 +20,41 @@ Allows users to choose between:
       <h1 class="mb-4">Choose Your Calculator</h1>
       <div class="row">
         <!-- Calculator 1 Card -->
-        <div class="col-md-6">
+        <div class="col-md-4">
           <div class="card text-center mb-4">
             <div class="card-body">
-              <h5 class="card-title">Calculator 1: I already have an idea of how much I can invest each month!</h5>
+              <h5 class="card-title">Calculator 1</h5>
               <p class="card-text">
-                Enter your monthly investment amount (plus any initial investment, if applicable), and we’ll calculate how much you could earn per month in retirement based on your accumulated investments.
+                I already have an idea of how much I can invest each month!<br>
+                Enter your monthly investment amount (and any initial investment), and see how much you could earn monthly in retirement.
               </p>
               <a href="{{ url_for('calculator1_index') }}" class="btn btn-primary">Go to Calculator 1</a>
             </div>
           </div>
         </div>
         <!-- Calculator 2 Card -->
-        <div class="col-md-6">
+        <div class="col-md-4">
           <div class="card text-center mb-4">
             <div class="card-body">
-              <h5 class="card-title">Calculator 2: I just know how much I want to earn monthly in retirement!</h5>
+              <h5 class="card-title">Calculator 2</h5>
               <p class="card-text">
-                Set your desired monthly retirement income (plus any initial investment, if applicable), and we’ll calculate how much you need to invest each month to reach your goal.
+                I just know how much I want to earn monthly in retirement!<br>
+                Set your target retirement income (and any initial investment) to find out how much you need to invest monthly.
               </p>
               <a href="{{ url_for('calculator2_index') }}" class="btn btn-success">Go to Calculator 2</a>
+            </div>
+          </div>
+        </div>
+        <!-- Calculator 3 Card -->
+        <div class="col-md-4">
+          <div class="card text-center mb-4">
+            <div class="card-body">
+              <h5 class="card-title">Calculator 3</h5>
+              <p class="card-text">
+                Let's find out how much I can save on average each month!<br>
+                Enter your monthly income and expenses, and we'll calculate your average potential savings.
+              </p>
+              <a href="{{ url_for('calculator3_index') }}" class="btn btn-info">Go to Calculator 3</a>
             </div>
           </div>
         </div>

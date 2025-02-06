@@ -1,16 +1,15 @@
 <!-- templates/calculator2_result.html -->
 <!--
 Results page for Calculator 2.
-Displays a table with the required monthly investment (PMT) for each duration (10, 15, 20, 25, 30, 35, 40, 45, and 50 years).
-If the computed PMT is negative, a message indicates that no additional investment is needed.
-Also shows the calculation parameters for user reference.
+Displays a table with the required monthly investment for durations of 10, 15, 20, 25, 30, 35, 40, 45, and 50 years.
+Also displays the input parameters for reference.
 -->
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Calculation Results - Calculator 2</title>
+    <title>Results - Calculator 2</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   </head>
@@ -34,11 +33,10 @@ Also shows the calculation parameters for user reference.
         </tbody>
       </table>
 
-      <!-- Display calculation parameters -->
       <div class="mt-4">
         <h2>Calculation Parameters</h2>
         <ul class="list-group">
-          <li class="list-group-item"><strong>Target Future Monthly Retirement Passive Income:</strong> {{ target_income }}</li>
+          <li class="list-group-item"><strong>Target Income:</strong> {{ target_income }}</li>
           <li class="list-group-item"><strong>Initial Investment:</strong> {{ initial_investment }}</li>
           <li class="list-group-item"><strong>Annual Return Rate (%):</strong> {{ annual_rate }}</li>
           <li class="list-group-item"><strong>Safe Withdrawal Rate (%):</strong> {{ safe_withdrawal_rate }}</li>
@@ -47,7 +45,7 @@ Also shows the calculation parameters for user reference.
 
       <a href="{{ url_for('calculator2_index') }}" class="btn btn-secondary mt-4">Back to Calculator 2</a>
     </div>
-    <!-- Bootstrap JS and dependencies -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

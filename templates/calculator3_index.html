@@ -1,0 +1,84 @@
+<!-- templates/calculator3_index.html -->
+<!--
+Input form for Calculator 3: Monthly Savings Potential Calculator.
+Users enter their salary after taxes (required) and optional expense amounts.
+The calculator computes available monthly savings as:
+   Savings = Salary after taxes - (Sum of all expenses)
+-->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Calculator 3 - Monthly Savings Potential</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 class="mb-4">Calculator 3: Monthly Savings Potential</h1>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form action="{{ url_for('calculator3_calculate') }}" method="POST">
+        <div class="mb-3">
+          <label for="salary" class="form-label">Salary after taxes (required)</label>
+          <input type="text" class="form-control" id="salary" name="salary" placeholder="" value="{{ salary }}" required>
+          <div class="form-text">Enter your salary using dot as thousands separator and comma as decimal separator.</div>
+        </div>
+        <hr>
+        <h5>Expenses (optional, leave blank if not applicable)</h5>
+        <div class="mb-3">
+          <label for="housing" class="form-label">Housing costs</label>
+          <input type="text" class="form-control" id="housing" name="housing" placeholder="" value="{{ housing }}">
+        </div>
+        <div class="mb-3">
+          <label for="utilities" class="form-label">Utilities &amp; bills</label>
+          <input type="text" class="form-control" id="utilities" name="utilities" placeholder="" value="{{ utilities }}">
+        </div>
+        <div class="mb-3">
+          <label for="transportation" class="form-label">Transportation costs</label>
+          <input type="text" class="form-control" id="transportation" name="transportation" placeholder="" value="{{ transportation }}">
+        </div>
+        <div class="mb-3">
+          <label for="food" class="form-label">Food &amp; groceries</label>
+          <input type="text" class="form-control" id="food" name="food" placeholder="" value="{{ food }}">
+        </div>
+        <div class="mb-3">
+          <label for="hobbies" class="form-label">Hobbies &amp; entertainment</label>
+          <input type="text" class="form-control" id="hobbies" name="hobbies" placeholder="" value="{{ hobbies }}">
+        </div>
+        <div class="mb-3">
+          <label for="subscriptions" class="form-label">Subscriptions &amp; memberships</label>
+          <input type="text" class="form-control" id="subscriptions" name="subscriptions" placeholder="" value="{{ subscriptions }}">
+        </div>
+        <div class="mb-3">
+          <label for="healthcare" class="form-label">Healthcare</label>
+          <input type="text" class="form-control" id="healthcare" name="healthcare" placeholder="" value="{{ healthcare }}">
+        </div>
+        <div class="mb-3">
+          <label for="debt" class="form-label">Debt repayments</label>
+          <input type="text" class="form-control" id="debt" name="debt" placeholder="" value="{{ debt }}">
+        </div>
+        <div class="mb-3">
+          <label for="other" class="form-label">Other expenses</label>
+          <input type="text" class="form-control" id="other" name="other" placeholder="" value="{{ other }}">
+        </div>
+        <button type="submit" class="btn btn-primary">Calculate Savings</button>
+      </form>
+
+      <a href="{{ url_for('home') }}" class="btn btn-secondary mt-4">Back to Home</a>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
