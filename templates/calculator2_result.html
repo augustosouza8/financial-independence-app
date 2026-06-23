@@ -1,51 +1,173 @@
-<!-- templates/calculator2_result.html -->
-<!--
-Results page for Calculator 2.
-Displays a table with the required monthly investment for durations of 10, 15, 20, 25, 30, 35, 40, 45, and 50 years.
-Also displays the input parameters for reference.
--->
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Results - Calculator 2</title>
+    <title>Results - Future Monthly Income</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   </head>
   <body>
-    <div class="container mt-5">
-      <h1 class="mb-4">Calculation Results</h1>
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>Years of Investment</th>
-            <th>Required Monthly Investment</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for result in results %}
-          <tr>
-            <td>{{ result.years }}</td>
-            <td>{{ result.required_investment }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div class="container mt-5 mb-5">
+      <div class="card p-4 mx-auto">
+        <h2 class="mb-4 text-center">Required Investment Projections</h2>
+        
+        <form action="{{ url_for('calculator2_calculate') }}" method="POST" class="row g-3 mb-4 align-items-end justify-content-center">
+          <div class="col-md-2 col-sm-6">
+            <label for="target_income" class="form-label fw-bold small text-muted mb-1">Target Income</label>
+            <input type="text" class="form-control form-control-sm currency-input" id="target_income" name="target_income" value="{{ target_income }}" required>
+          </div>
+          <div class="col-md-2 col-sm-6">
+            <label for="initial_investment" class="form-label fw-bold small text-muted mb-1">Initial Investment</label>
+            <input type="text" class="form-control form-control-sm currency-input" id="initial_investment" name="initial_investment" value="{{ initial_investment }}">
+          </div>
+          <div class="col-md-2 col-sm-6">
+            <label for="annual_rate" class="form-label fw-bold small text-muted mb-1">Annual Rate (%)</label>
+            <input type="text" class="form-control form-control-sm percent-input" id="annual_rate" name="annual_rate" value="{{ annual_rate }}" required>
+          </div>
+          <div class="col-md-2 col-sm-6">
+            <label for="safe_withdrawal_rate" class="form-label fw-bold small text-muted mb-1">Safe Withdrawal (%)</label>
+            <input type="text" class="form-control form-control-sm percent-input" id="safe_withdrawal_rate" name="safe_withdrawal_rate" value="{{ safe_withdrawal_rate }}" required>
+          </div>
+          <div class="col-md-2 col-sm-6">
+            <label for="birth_year" class="form-label fw-bold small text-muted mb-1">Birth Year (Optional)</label>
+            <input type="number" class="form-control form-control-sm" id="birth_year" name="birth_year" value="{{ birth_year }}" min="1900" max="2030">
+          </div>
+          <div class="col-md-2 col-sm-6 d-grid">
+            <button type="submit" class="btn btn-success btn-sm pt-2 pb-2">Recalculate</button>
+          </div>
+        </form>
+        
+        <div class="chart-container">
+          <canvas id="projectionChart"></canvas>
+        </div>
 
-      <div class="mt-4">
-        <h2>Calculation Parameters</h2>
-        <ul class="list-group">
-          <li class="list-group-item"><strong>Target Income:</strong> {{ target_income }}</li>
-          <li class="list-group-item"><strong>Initial Investment:</strong> {{ initial_investment }}</li>
-          <li class="list-group-item"><strong>Annual Return Rate (%):</strong> {{ annual_rate }}</li>
-          <li class="list-group-item"><strong>Safe Withdrawal Rate (%):</strong> {{ safe_withdrawal_rate }}</li>
-        </ul>
+        <div class="table-responsive mt-4">
+          <table class="table table-hover table-striped">
+            <thead>
+              <tr>
+                <th>Years to Retire</th>
+                <th>Required Monthly Investment</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in results %}
+              <tr>
+                <td>
+                  {{ row.years }} Years
+                  {% if row.age %}
+                  <br><small class="text-muted">Year: {{ row.future_year }} | Age: {{ row.age }}</small>
+                  {% endif %}
+                </td>
+                <td><strong>{{ row.required_investment }}</strong></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="text-center mt-4">
+          <a href="{{ url_for('calculator2_index') }}" class="btn btn-secondary">Back to Calculator</a>
+          <a href="{{ url_for('home') }}" class="btn btn-outline-secondary">Back to Home</a>
+        </div>
       </div>
-
-      <a href="{{ url_for('calculator2_index') }}" class="btn btn-secondary mt-4">Back to Calculator 2</a>
     </div>
+    
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Cleave.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cleave.js/1.6.0/cleave.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.currency-input').forEach(function(el) {
+          new Cleave(el, {
+            numeral: true,
+            numeralThousandsGroupStyle: 'thousand',
+            delimiter: '.',
+            numeralDecimalMark: ',',
+            numeralDecimalScale: 2
+          });
+        });
+        document.querySelectorAll('.percent-input').forEach(function(el) {
+          new Cleave(el, {
+            numeral: true,
+            delimiter: '.',
+            numeralDecimalMark: ',',
+            numeralDecimalScale: 2
+          });
+        });
+      });
+      const ctx = document.getElementById('projectionChart').getContext('2d');
+      const labels = [{% for r in results %}{{ r.years }}{% if not loop.last %},{% endif %}{% endfor %}];
+      const pmtData = [{% for r in results %}{{ r.required_investment_raw }}{% if not loop.last %},{% endif %}{% endfor %}];
+      const ageData = [{% for r in results %}{{ r.age or 'null' }}{% if not loop.last %},{% endif %}{% endfor %}];
+      const yearData = [{% for r in results %}{{ r.future_year or 'null' }}{% if not loop.last %},{% endif %}{% endfor %}];
+
+      function formatPortugueseNumber(value, decimals = 2) {
+        return Number(value).toLocaleString('pt-BR', {
+          minimumFractionDigits: decimals,
+          maximumFractionDigits: decimals
+        });
+      }
+
+      const chartLabels = labels.map((y, idx) => {
+        if (ageData[idx] !== null) {
+          return `${y} Years (${yearData[idx]} - Age: ${ageData[idx]})`;
+        }
+        return y + ' Years';
+      });
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: chartLabels,
+          datasets: [
+            {
+              label: 'Required Monthly Investment',
+              data: pmtData,
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              tension: 0.4,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let label = context.dataset.label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  if (context.parsed.y !== null) {
+                    label += formatPortugueseNumber(context.parsed.y, 2);
+                  }
+                  return label;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: 'Monthly Investment Amount' },
+              ticks: {
+                callback: function(value) {
+                  return formatPortugueseNumber(value, 2);
+                }
+              }
+            }
+          }
+        }
+      });
+    </script>
   </body>
 </html>

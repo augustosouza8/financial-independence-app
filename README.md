@@ -98,8 +98,25 @@ flask run --debug --port=5001
 4. Submit a pull request
 
 ## Production Deployment
-The application is configured to run with Gunicorn in production:
+
+### Deploying to Render (Free Tier)
+This application includes a `render.yaml` file, making it incredibly easy to deploy to [Render.com](https://render.com/).
+
+1. Create a GitHub repository and push your code (ensure `.env` is **not** committed).
+2. Log in to Render and create a new **Blueprint Instance**.
+3. Connect your GitHub repository.
+4. Render will automatically detect the `render.yaml` configuration and deploy the app.
+5. Render will generate a secure `SECRET_KEY` automatically.
+
+*Note: Render's free tier spins down the server after 15 minutes of inactivity. The first request after a spin-down may take ~50 seconds to load.*
+
+### Manual Gunicorn Deployment
+If deploying manually to another server:
 ```bash
+# 1. Ensure you have a .env file with a secure SECRET_KEY
+cp .env.example .env
+
+# 2. Run with Gunicorn
 gunicorn app:app
 ```
 
