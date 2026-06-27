@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Results - Future Monthly Income</title>
+    <title>Resultados - Renda Alvo</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS -->
@@ -12,53 +12,53 @@
   <body>
     <div class="container mt-5 mb-5">
       <div class="card p-4 mx-auto">
-        <h2 class="mb-4 text-center">Required Investment Projections</h2>
+        <h2 class="mb-4 text-center">Projeções de Investimento Necessário</h2>
         
         <form action="{{ url_for('calculator2_calculate') }}" method="POST" class="row g-3 mb-4 align-items-end justify-content-center">
           <div class="col-md-2 col-sm-6">
-            <label for="target_income" class="form-label fw-bold small text-muted mb-1">Target Income</label>
+            <label for="target_income" class="form-label fw-bold small text-muted mb-1">Renda Alvo</label>
             <input type="text" class="form-control form-control-sm currency-input" id="target_income" name="target_income" value="{{ target_income }}" required>
           </div>
           <div class="col-md-2 col-sm-6">
-            <label for="initial_investment" class="form-label fw-bold small text-muted mb-1">Initial Investment</label>
+            <label for="initial_investment" class="form-label fw-bold small text-muted mb-1">Investimento Inicial</label>
             <input type="text" class="form-control form-control-sm currency-input" id="initial_investment" name="initial_investment" value="{{ initial_investment }}">
           </div>
           <div class="col-md-2 col-sm-6">
-            <label for="annual_rate" class="form-label fw-bold small text-muted mb-1">Annual Rate (%)</label>
+            <label for="annual_rate" class="form-label fw-bold small text-muted mb-1">Taxa Anual (%)</label>
             <input type="text" class="form-control form-control-sm percent-input" id="annual_rate" name="annual_rate" value="{{ annual_rate }}" required>
           </div>
           <div class="col-md-2 col-sm-6">
-            <label for="safe_withdrawal_rate" class="form-label fw-bold small text-muted mb-1">Safe Withdrawal (%)</label>
+            <label for="safe_withdrawal_rate" class="form-label fw-bold small text-muted mb-1">Retirada Segura (%)</label>
             <input type="text" class="form-control form-control-sm percent-input" id="safe_withdrawal_rate" name="safe_withdrawal_rate" value="{{ safe_withdrawal_rate }}" required>
           </div>
           <div class="col-md-2 col-sm-6">
-            <label for="birth_year" class="form-label fw-bold small text-muted mb-1">Birth Year (Optional)</label>
+            <label for="birth_year" class="form-label fw-bold small text-muted mb-1">Ano de Nascimento (Opcional)</label>
             <input type="number" class="form-control form-control-sm" id="birth_year" name="birth_year" value="{{ birth_year }}" min="1900" max="2030">
           </div>
           <div class="col-md-2 col-sm-6 d-grid">
-            <button type="submit" class="btn btn-success btn-sm pt-2 pb-2">Recalculate</button>
+            <button type="submit" class="btn btn-success btn-sm pt-2 pb-2">Recalcular</button>
           </div>
         </form>
         
         <div class="chart-container">
           <canvas id="projectionChart"></canvas>
         </div>
-
+ 
         <div class="table-responsive mt-4">
           <table class="table table-hover table-striped">
             <thead>
               <tr>
-                <th>Years to Retire</th>
-                <th>Required Monthly Investment</th>
+                <th>Anos para Aposentar</th>
+                <th>Investimento Mensal Necessário</th>
               </tr>
             </thead>
             <tbody>
               {% for row in results %}
               <tr>
                 <td>
-                  {{ row.years }} Years
+                  {{ row.years }} Anos
                   {% if row.age %}
-                  <br><small class="text-muted">Year: {{ row.future_year }} | Age: {{ row.age }}</small>
+                  <br><small class="text-muted">Ano: {{ row.future_year }} | Idade: {{ row.age }} anos</small>
                   {% endif %}
                 </td>
                 <td><strong>{{ row.required_investment }}</strong></td>
@@ -67,10 +67,10 @@
             </tbody>
           </table>
         </div>
-
+ 
         <div class="text-center mt-4">
-          <a href="{{ url_for('calculator2_index') }}" class="btn btn-secondary">Back to Calculator</a>
-          <a href="{{ url_for('home') }}" class="btn btn-outline-secondary">Back to Home</a>
+          <a href="{{ url_for('calculator2_index') }}" class="btn btn-secondary">Voltar para a Calculadora</a>
+          <a href="{{ url_for('home') }}" class="btn btn-outline-secondary">Voltar para o Início</a>
         </div>
       </div>
     </div>
@@ -106,28 +106,28 @@
       const pmtData = [{% for r in results %}{{ r.required_investment_raw }}{% if not loop.last %},{% endif %}{% endfor %}];
       const ageData = [{% for r in results %}{{ r.age or 'null' }}{% if not loop.last %},{% endif %}{% endfor %}];
       const yearData = [{% for r in results %}{{ r.future_year or 'null' }}{% if not loop.last %},{% endif %}{% endfor %}];
-
+ 
       function formatPortugueseNumber(value, decimals = 2) {
         return Number(value).toLocaleString('pt-BR', {
           minimumFractionDigits: decimals,
           maximumFractionDigits: decimals
         });
       }
-
+ 
       const chartLabels = labels.map((y, idx) => {
         if (ageData[idx] !== null) {
-          return `${y} Years (${yearData[idx]} - Age: ${ageData[idx]})`;
+          return `${y} Anos (${yearData[idx]} - Idade: ${ageData[idx]} anos)`;
         }
-        return y + ' Years';
+        return y + ' Anos';
       });
-
+ 
       new Chart(ctx, {
         type: 'line',
         data: {
           labels: chartLabels,
           datasets: [
             {
-              label: 'Required Monthly Investment',
+              label: 'Investimento Mensal Necessário',
               data: pmtData,
               borderColor: '#10b981',
               backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -158,7 +158,7 @@
           scales: {
             y: {
               beginAtZero: true,
-              title: { display: true, text: 'Monthly Investment Amount' },
+              title: { display: true, text: 'Valor do Investimento Mensal' },
               ticks: {
                 callback: function(value) {
                   return formatPortugueseNumber(value, 2);

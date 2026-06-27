@@ -24,21 +24,35 @@ def format_currency(value):
 def calculate_calculator1(monthly_savings, initial_investment, annual_rate, safe_withdrawal_rate, birth_year=None, current_year=None):
     """
     Calculates future investment value and projected monthly passive income over various durations.
+    Supports either a single monthly_savings float or a list of period-specific savings floats.
     Returns a list of dictionaries with raw and formatted results.
     """
     monthly_rate = (1 + annual_rate / 100) ** (1 / 12) - 1
     durations = [10, 15, 20, 25, 30, 35, 40, 45, 50]
+    
+    if not isinstance(monthly_savings, list):
+        monthly_savings = [monthly_savings] * len(durations)
+        
     results = []
+    current_fv = initial_investment
 
-    for years in durations:
-        n = years * 12
+    for i, years in enumerate(durations):
+        prev_years = durations[i-1] if i > 0 else 0
+        interval_years = years - prev_years
+        n = interval_years * 12
+        
+        savings = monthly_savings[i]
+        
         try:
-            fv = initial_investment * (1 + monthly_rate) ** n + \
-                 monthly_savings * (((1 + monthly_rate) ** n - 1) / monthly_rate)
+            if monthly_rate > 0:
+                current_fv = current_fv * (1 + monthly_rate) ** n + \
+                             savings * (((1 + monthly_rate) ** n - 1) / monthly_rate)
+            else:
+                current_fv = current_fv + savings * n
         except ZeroDivisionError:
             raise ValueError("Zero division error during calculation.")
             
-        monthly_income = fv * ((safe_withdrawal_rate / 100) / 12)
+        monthly_income = current_fv * ((safe_withdrawal_rate / 100) / 12)
         
         age = None
         future_year = None
@@ -48,10 +62,12 @@ def calculate_calculator1(monthly_savings, initial_investment, annual_rate, safe
             
         results.append({
             "years": years,
-            "future_value_raw": fv,
+            "future_value_raw": current_fv,
             "monthly_income_raw": monthly_income,
-            "future_value": format_currency(fv),
+            "future_value": format_currency(current_fv),
             "monthly_income": format_currency(monthly_income),
+            "period_savings_raw": savings,
+            "period_savings": format_currency(savings),
             "age": age,
             "future_year": future_year
         })
@@ -79,7 +95,7 @@ def calculate_calculator2(target_income, initial_investment, annual_rate, safe_w
             
         pmt_raw = pmt if pmt > 0 else 0
         if pmt < 0:
-            required_investment_display = "Already retired! (No additional investment needed)"
+            required_investment_display = "Já aposentado! (Nenhum investimento adicional necessário)"
         else:
             required_investment_display = format_currency(pmt)
             

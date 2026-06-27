@@ -65,44 +65,59 @@ def calculator1_calculate():
     annual_rate_str = request.form.get('annual_rate', '').strip()
     safe_withdrawal_rate_str = request.form.get('safe_withdrawal_rate', '').strip()
     birth_year_str = request.form.get('birth_year', '').strip()
+    
+    # Read period-specific savings from form
+    period_savings_strs = request.form.getlist('period_savings')
+    if not period_savings_strs:
+        # Default to global monthly savings if not present (submitting from index page)
+        period_savings_strs = [monthly_savings_str] * 9
 
     session['monthly_savings'] = monthly_savings_str if monthly_savings_str else "3.000,00"
     session['initial_investment'] = initial_investment_str if initial_investment_str else "10.000,00"
     session['annual_rate'] = annual_rate_str if annual_rate_str else "6,00"
     session['safe_withdrawal_rate'] = safe_withdrawal_rate_str if safe_withdrawal_rate_str else "4,00"
     session['birth_year'] = birth_year_str
+    session['period_savings'] = period_savings_strs
 
     monthly_savings = parse_localized_number(monthly_savings_str) if monthly_savings_str else 0.0
     initial_investment = parse_localized_number(initial_investment_str) if initial_investment_str else 0.0
     annual_rate = parse_localized_number(annual_rate_str) if annual_rate_str else None
     safe_withdrawal_rate = parse_localized_number(safe_withdrawal_rate_str) if safe_withdrawal_rate_str else 4.0
     
+    # Parse period savings list
+    period_savings = []
+    for s in period_savings_strs:
+        val = parse_localized_number(s)
+        period_savings.append(val if val is not None else monthly_savings)
+
     birth_year = None
     current_year = datetime.date.today().year
     if birth_year_str:
         try:
             birth_year = int(birth_year_str)
             if birth_year < 1900 or birth_year > current_year:
-                flash(f"Birth year must be between 1900 and {current_year}.", "danger")
+                flash(f"O ano de nascimento deve ser entre 1900 e {current_year}.", "danger")
                 return redirect(url_for('calculator1_index'))
         except ValueError:
-            flash("Please enter a valid birth year.", "danger")
+            flash("Por favor, insira um ano de nascimento válido.", "danger")
             return redirect(url_for('calculator1_index'))
 
     if annual_rate is None or annual_rate <= 0:
-        flash("Please enter a valid Annual Return Rate greater than 0.", "danger")
+        flash("Por favor, insira uma Taxa de Retorno Anual válida e maior que 0.", "danger")
         return redirect(url_for('calculator1_index'))
     if safe_withdrawal_rate is None or safe_withdrawal_rate <= 0:
-        flash("Please enter a valid Safe Withdrawal Rate greater than 0.", "danger")
+        flash("Por favor, insira uma Taxa de Retirada Segura válida e maior que 0.", "danger")
         return redirect(url_for('calculator1_index'))
-    if monthly_savings <= 0 and initial_investment <= 0:
-        flash("Please provide a value for either Monthly Savings or Initial Investment.", "danger")
+    if all(val <= 0 for val in period_savings) and initial_investment <= 0:
+        flash("Por favor, forneça um valor para a Economia Mensal ou para o Investimento Inicial.", "danger")
         return redirect(url_for('calculator1_index'))
 
+    has_custom_savings = any(s != monthly_savings_str for s in period_savings_strs)
+
     try:
-        results = calculate_calculator1(monthly_savings, initial_investment, annual_rate, safe_withdrawal_rate, birth_year, current_year)
+        results = calculate_calculator1(period_savings, initial_investment, annual_rate, safe_withdrawal_rate, birth_year, current_year)
     except ValueError:
-        flash("An error occurred during calculation.", "danger")
+        flash("Ocorreu um erro durante o cálculo.", "danger")
         return redirect(url_for('calculator1_index'))
 
     return render_template('result.html', results=results,
@@ -110,7 +125,8 @@ def calculator1_calculate():
                            initial_investment=session['initial_investment'],
                            annual_rate=session['annual_rate'],
                            safe_withdrawal_rate=session['safe_withdrawal_rate'],
-                           birth_year=session['birth_year'])
+                           birth_year=session['birth_year'],
+                           has_custom_savings=has_custom_savings)
 
 # -------------------------------------------------------------
 # Calculator 2: Future Monthly Income Calculator
@@ -161,26 +177,26 @@ def calculator2_calculate():
         try:
             birth_year = int(birth_year_str)
             if birth_year < 1900 or birth_year > current_year:
-                flash(f"Birth year must be between 1900 and {current_year}.", "danger")
+                flash(f"O ano de nascimento deve ser entre 1900 e {current_year}.", "danger")
                 return redirect(url_for('calculator2_index'))
         except ValueError:
-            flash("Please enter a valid birth year.", "danger")
+            flash("Por favor, insira um ano de nascimento válido.", "danger")
             return redirect(url_for('calculator2_index'))
 
     if target_income is None or target_income <= 0:
-        flash("Please enter a valid Target Future Monthly Retirement Passive Income greater than 0.", "danger")
+        flash("Por favor, insira uma Renda Mensal Futura Desejada válida e maior que 0.", "danger")
         return redirect(url_for('calculator2_index'))
     if annual_rate is None or annual_rate <= 0:
-        flash("Please enter a valid Annual Return Rate greater than 0.", "danger")
+        flash("Por favor, insira uma Taxa de Retorno Anual válida e maior que 0.", "danger")
         return redirect(url_for('calculator2_index'))
     if safe_withdrawal_rate is None or safe_withdrawal_rate <= 0:
-        flash("Please enter a valid Safe Withdrawal Rate greater than 0.", "danger")
+        flash("Por favor, insira uma Taxa de Retirada Segura válida e maior que 0.", "danger")
         return redirect(url_for('calculator2_index'))
 
     try:
         results = calculate_calculator2(target_income, initial_investment, annual_rate, safe_withdrawal_rate, birth_year, current_year)
     except ValueError:
-        flash("An error occurred during calculation.", "danger")
+        flash("Ocorreu um erro durante o cálculo.", "danger")
         return redirect(url_for('calculator2_index'))
 
     return render_template('calculator2_result.html', results=results,
@@ -249,7 +265,7 @@ def calculator3_calculate():
 
     salary = parse_localized_number(salary_str)
     if salary is None or salary <= 0:
-        flash("Please enter a valid Salary after taxes (must be greater than 0).", "danger")
+        flash("Por favor, insira um Salário Líquido válido (deve ser maior que 0).", "danger")
         return redirect(url_for('calculator3_index'))
 
     housing_val = parse_localized_number(housing_str) if housing_str else 0.0

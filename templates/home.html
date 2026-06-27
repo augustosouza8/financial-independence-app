@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Financial Independence Calculators</title>
+    <title>Calculadoras de Independência Financeira</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS -->
@@ -12,19 +12,19 @@
   <body>
     <div class="container mt-5 mb-5">
       <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold">Financial Independence</h1>
-        <p class="lead text-muted">Choose a calculator to start planning your future.</p>
+        <h1 class="display-4 fw-bold">Independência Financeira</h1>
+        <p class="lead text-muted">Escolha uma calculadora para começar a planejar seu futuro.</p>
       </div>
       <div class="row g-4">
         <!-- Calculator 1 Card -->
         <div class="col-md-4">
           <div class="card h-100 text-center p-3">
             <div class="card-body d-flex flex-column">
-              <h5 class="card-title">Monthly Investment</h5>
+              <h5 class="card-title">Investimento Mensal</h5>
               <p class="card-text flex-grow-1">
-                I already have an idea of how much I can invest each month! Enter your monthly investment and see how much you could earn.
+                Eu já sei quanto posso investir por mês! Insira seu aporte mensal e veja o quanto você pode acumular.
               </p>
-              <a href="{{ url_for('calculator1_index') }}" class="btn btn-primary mt-3">Start Calculating</a>
+              <a href="{{ url_for('calculator1_index') }}" class="btn btn-primary mt-3">Começar a Calcular</a>
             </div>
           </div>
         </div>
@@ -32,11 +32,11 @@
         <div class="col-md-4">
           <div class="card h-100 text-center p-3">
             <div class="card-body d-flex flex-column">
-              <h5 class="card-title">Target Income</h5>
+              <h5 class="card-title">Renda Alvo</h5>
               <p class="card-text flex-grow-1">
-                I know how much I want to earn monthly in retirement! Find out how much you need to invest.
+                Eu já sei quanto quero receber por mês na aposentadoria! Descubra quanto precisa investir.
               </p>
-              <a href="{{ url_for('calculator2_index') }}" class="btn btn-success mt-3">Start Calculating</a>
+              <a href="{{ url_for('calculator2_index') }}" class="btn btn-success mt-3">Começar a Calcular</a>
             </div>
           </div>
         </div>
@@ -44,11 +44,11 @@
         <div class="col-md-4">
           <div class="card h-100 text-center p-3">
             <div class="card-body d-flex flex-column">
-              <h5 class="card-title">Savings Potential</h5>
+              <h5 class="card-title">Potencial de Economia</h5>
               <p class="card-text flex-grow-1">
-                Let's find out how much I can save! Enter your income and expenses to calculate your savings.
+                Vamos descobrir quanto posso economizar! Insira sua receita e despesas para calcular sua economia.
               </p>
-              <a href="{{ url_for('calculator3_index') }}" class="btn btn-info mt-3">Start Calculating</a>
+              <a href="{{ url_for('calculator3_index') }}" class="btn btn-info mt-3">Começar a Calcular</a>
             </div>
           </div>
         </div>
