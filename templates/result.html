@@ -25,11 +25,11 @@
               <input type="text" class="form-control form-control-sm currency-input" id="initial_investment" name="initial_investment" value="{{ initial_investment }}">
             </div>
             <div class="col-md-2 col-sm-6">
-              <label for="annual_rate" class="form-label fw-bold small text-muted mb-1">Taxa Anual (%)</label>
+              <label for="annual_rate" class="form-label fw-bold small text-muted mb-1">Taxa de Retorno Anual (%)</label>
               <input type="text" class="form-control form-control-sm percent-input" id="annual_rate" name="annual_rate" value="{{ annual_rate }}" required>
             </div>
             <div class="col-md-2 col-sm-6">
-              <label for="safe_withdrawal_rate" class="form-label fw-bold small text-muted mb-1">Retirada Segura (%)</label>
+              <label for="safe_withdrawal_rate" class="form-label fw-bold small text-muted mb-1">Taxa de Retirada Segura (%)</label>
               <input type="text" class="form-control form-control-sm percent-input" id="safe_withdrawal_rate" name="safe_withdrawal_rate" value="{{ safe_withdrawal_rate }}" required>
             </div>
             <div class="col-md-2 col-sm-6">
@@ -41,16 +41,13 @@
             </div>
           </div>
         
-        <div class="chart-container">
-          <canvas id="projectionChart"></canvas>
-        </div>
-
         <div class="table-responsive">
           <table class="table table-hover table-striped align-middle">
             <thead>
               <tr>
                 <th>Anos Investidos</th>
                 <th class="savings-column {% if not has_custom_savings %}d-none{% endif %}" style="width: 160px;">Aporte Mensal</th>
+                <th class="savings-column {% if not has_custom_savings %}d-none{% endif %}" style="width: 160px;">Aporte Extra Único</th>
                 <th>Valor Futuro</th>
                 <th>Renda Passiva Mensal</th>
               </tr>
@@ -67,6 +64,9 @@
                 <td class="savings-column {% if not has_custom_savings %}d-none{% endif %}">
                   <input type="text" class="form-control form-control-sm currency-input period-savings-input" name="period_savings" value="{{ row.period_savings }}" style="max-width: 140px;">
                 </td>
+                <td class="savings-column {% if not has_custom_savings %}d-none{% endif %}">
+                  <input type="text" class="form-control form-control-sm currency-input period-extra-input" name="period_extra_deposits" value="{{ row.period_extra }}" style="max-width: 140px;">
+                </td>
                 <td>{{ row.future_value }}</td>
                 <td><strong>{{ row.monthly_income }}</strong></td>
               </tr>
@@ -79,6 +79,10 @@
         <div class="form-check form-switch mb-3 d-flex justify-content-center align-items-center mt-4">
           <input class="form-check-input me-2" type="checkbox" role="switch" id="toggleSavingsCol" {% if has_custom_savings %}checked{% endif %}>
           <label class="form-check-label fw-semibold text-muted" for="toggleSavingsCol">Deseja alterar os valores investidos ao longo do tempo?</label>
+        </div>
+
+        <div class="chart-container mt-4">
+          <canvas id="projectionChart"></canvas>
         </div>
 
         <div class="text-center mt-4">
@@ -159,6 +163,12 @@
               const mainSavingsVal = document.getElementById('monthly_savings').value;
               periodInputs.forEach(input => {
                 input.value = mainSavingsVal;
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+              });
+              // Reset period extra deposits to 0,00
+              const periodExtraInputs = document.querySelectorAll('.period-extra-input');
+              periodExtraInputs.forEach(input => {
+                input.value = "0,00";
                 input.dispatchEvent(new Event('input', { bubbles: true }));
               });
             }

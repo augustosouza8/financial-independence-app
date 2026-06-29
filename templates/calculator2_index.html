@@ -27,7 +27,7 @@
  
         <form action="{{ url_for('calculator2_calculate') }}" method="POST">
           <div class="mb-3">
-            <label for="target_income" class="form-label">Renda Mensal Futura Desejada</label>
+            <label for="target_income" class="form-label">Renda Alvo</label>
             <input type="text" class="form-control currency-input" id="target_income" name="target_income" placeholder="0,00" value="{{ target_income }}" required>
           </div>
           <div class="mb-3">
@@ -45,6 +45,16 @@
           <div class="mb-3">
             <label for="birth_year" class="form-label">Ano de Nascimento (Opcional)</label>
             <input type="number" class="form-control" id="birth_year" name="birth_year" placeholder="Opcional (ex: 1990)" min="1900" max="2030" value="{{ birth_year }}">
+          </div>
+          <div class="row animate-fade-in">
+            <div class="col-md-6 mb-3">
+              <label for="extra_deposit" class="form-label">Aporte Extra Único (Opcional)</label>
+              <input type="text" class="form-control currency-input" id="extra_deposit" name="extra_deposit" placeholder="0,00" value="{{ extra_deposit }}">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="extra_deposit_year" class="form-label">Ano do Aporte Extra (Opcional)</label>
+              <input type="number" class="form-control" id="extra_deposit_year" name="extra_deposit_year" placeholder="Ex: 15" min="1" max="100" value="{{ extra_deposit_year }}">
+            </div>
           </div>
           
           <div class="d-grid mt-4">

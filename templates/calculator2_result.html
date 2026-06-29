@@ -24,26 +24,30 @@
             <input type="text" class="form-control form-control-sm currency-input" id="initial_investment" name="initial_investment" value="{{ initial_investment }}">
           </div>
           <div class="col-md-2 col-sm-6">
-            <label for="annual_rate" class="form-label fw-bold small text-muted mb-1">Taxa Anual (%)</label>
+            <label for="annual_rate" class="form-label fw-bold small text-muted mb-1">Taxa de Retorno Anual (%)</label>
             <input type="text" class="form-control form-control-sm percent-input" id="annual_rate" name="annual_rate" value="{{ annual_rate }}" required>
           </div>
           <div class="col-md-2 col-sm-6">
-            <label for="safe_withdrawal_rate" class="form-label fw-bold small text-muted mb-1">Retirada Segura (%)</label>
+            <label for="safe_withdrawal_rate" class="form-label fw-bold small text-muted mb-1">Taxa de Retirada Segura (%)</label>
             <input type="text" class="form-control form-control-sm percent-input" id="safe_withdrawal_rate" name="safe_withdrawal_rate" value="{{ safe_withdrawal_rate }}" required>
           </div>
           <div class="col-md-2 col-sm-6">
             <label for="birth_year" class="form-label fw-bold small text-muted mb-1">Ano de Nascimento (Opcional)</label>
             <input type="number" class="form-control form-control-sm" id="birth_year" name="birth_year" value="{{ birth_year }}" min="1900" max="2030">
           </div>
+          <div class="col-md-2 col-sm-6">
+            <label for="extra_deposit" class="form-label fw-bold small text-muted mb-1">Aporte Extra Único</label>
+            <input type="text" class="form-control form-control-sm currency-input" id="extra_deposit" name="extra_deposit" value="{{ extra_deposit }}">
+          </div>
+          <div class="col-md-2 col-sm-6">
+            <label for="extra_deposit_year" class="form-label fw-bold small text-muted mb-1">Ano do Aporte Extra</label>
+            <input type="number" class="form-control form-control-sm" id="extra_deposit_year" name="extra_deposit_year" value="{{ extra_deposit_year }}" min="1" max="100">
+          </div>
           <div class="col-md-2 col-sm-6 d-grid">
             <button type="submit" class="btn btn-success btn-sm pt-2 pb-2">Recalcular</button>
           </div>
         </form>
         
-        <div class="chart-container">
-          <canvas id="projectionChart"></canvas>
-        </div>
- 
         <div class="table-responsive mt-4">
           <table class="table table-hover table-striped">
             <thead>
@@ -66,6 +70,10 @@
               {% endfor %}
             </tbody>
           </table>
+        </div>
+
+        <div class="chart-container mt-4">
+          <canvas id="projectionChart"></canvas>
         </div>
  
         <div class="text-center mt-4">

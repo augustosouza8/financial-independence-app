@@ -70,7 +70,12 @@ def calculator1_calculate():
     period_savings_strs = request.form.getlist('period_savings')
     if not period_savings_strs:
         # Default to global monthly savings if not present (submitting from index page)
-        period_savings_strs = [monthly_savings_str] * 9
+        period_savings_strs = [monthly_savings_str] * 10
+
+    # Read period-specific one-off extra deposits
+    period_extra_deposits_strs = request.form.getlist('period_extra_deposits')
+    if not period_extra_deposits_strs:
+        period_extra_deposits_strs = ["0,00"] * 10
 
     session['monthly_savings'] = monthly_savings_str if monthly_savings_str else "3.000,00"
     session['initial_investment'] = initial_investment_str if initial_investment_str else "10.000,00"
@@ -78,6 +83,7 @@ def calculator1_calculate():
     session['safe_withdrawal_rate'] = safe_withdrawal_rate_str if safe_withdrawal_rate_str else "4,00"
     session['birth_year'] = birth_year_str
     session['period_savings'] = period_savings_strs
+    session['period_extra_deposits'] = period_extra_deposits_strs
 
     monthly_savings = parse_localized_number(monthly_savings_str) if monthly_savings_str else 0.0
     initial_investment = parse_localized_number(initial_investment_str) if initial_investment_str else 0.0
@@ -89,6 +95,12 @@ def calculator1_calculate():
     for s in period_savings_strs:
         val = parse_localized_number(s)
         period_savings.append(val if val is not None else monthly_savings)
+
+    # Parse period extra deposits list
+    period_extra_deposits = []
+    for e in period_extra_deposits_strs:
+        val = parse_localized_number(e)
+        period_extra_deposits.append(val if val is not None else 0.0)
 
     birth_year = None
     current_year = datetime.date.today().year
@@ -108,14 +120,16 @@ def calculator1_calculate():
     if safe_withdrawal_rate is None or safe_withdrawal_rate <= 0:
         flash("Por favor, insira uma Taxa de Retirada Segura válida e maior que 0.", "danger")
         return redirect(url_for('calculator1_index'))
-    if all(val <= 0 for val in period_savings) and initial_investment <= 0:
-        flash("Por favor, forneça um valor para a Economia Mensal ou para o Investimento Inicial.", "danger")
+    if all(val <= 0 for val in period_savings) and all(val <= 0 for val in period_extra_deposits) and initial_investment <= 0:
+        flash("Por favor, forneça um valor para a Economia Mensal, Aporte Extra ou Investimento Inicial.", "danger")
         return redirect(url_for('calculator1_index'))
 
-    has_custom_savings = any(s != monthly_savings_str for s in period_savings_strs)
+    # Check if user customized savings (different savings than global, or any non-zero extra deposits)
+    has_custom_savings = any(s != monthly_savings_str for s in period_savings_strs) or \
+                         any(e != "0,00" and e != "" for e in period_extra_deposits_strs)
 
     try:
-        results = calculate_calculator1(period_savings, initial_investment, annual_rate, safe_withdrawal_rate, birth_year, current_year)
+        results = calculate_calculator1(period_savings, initial_investment, annual_rate, safe_withdrawal_rate, birth_year, current_year, period_extra_deposits)
     except ValueError:
         flash("Ocorreu um erro durante o cálculo.", "danger")
         return redirect(url_for('calculator1_index'))
@@ -141,12 +155,16 @@ def calculator2_index():
     annual_rate = session.get('annual_rate_c2', '6,00')
     safe_withdrawal_rate = session.get('safe_withdrawal_rate_c2', '4,00')
     birth_year = session.get('birth_year_c2', '')
+    extra_deposit = session.get('extra_deposit_c2', '0,00')
+    extra_deposit_year = session.get('extra_deposit_year_c2', '')
     return render_template('calculator2_index.html',
                            target_income=target_income,
                            initial_investment=initial_investment,
                            annual_rate=annual_rate,
                            safe_withdrawal_rate=safe_withdrawal_rate,
-                           birth_year=birth_year)
+                           birth_year=birth_year,
+                           extra_deposit=extra_deposit,
+                           extra_deposit_year=extra_deposit_year)
 
 @app.route('/calculator-2-user-set-future-monthly-income/calculate', methods=['POST'])
 def calculator2_calculate():
@@ -159,17 +177,33 @@ def calculator2_calculate():
     annual_rate_str = request.form.get('annual_rate', '').strip()
     safe_withdrawal_rate_str = request.form.get('safe_withdrawal_rate', '').strip()
     birth_year_str = request.form.get('birth_year', '').strip()
+    extra_deposit_str = request.form.get('extra_deposit', '').strip()
+    extra_deposit_year_str = request.form.get('extra_deposit_year', '').strip()
 
     session['target_income'] = target_income_str if target_income_str else "7.000,00"
     session['initial_investment_c2'] = initial_investment_str if initial_investment_str else "10.000,00"
     session['annual_rate_c2'] = annual_rate_str if annual_rate_str else "6,00"
     session['safe_withdrawal_rate_c2'] = safe_withdrawal_rate_str if safe_withdrawal_rate_str else "4,00"
     session['birth_year_c2'] = birth_year_str
+    session['extra_deposit_c2'] = extra_deposit_str if extra_deposit_str else "0,00"
+    session['extra_deposit_year_c2'] = extra_deposit_year_str
 
     target_income = parse_localized_number(target_income_str)
     initial_investment = parse_localized_number(initial_investment_str) if initial_investment_str else 0.0
     annual_rate = parse_localized_number(annual_rate_str) if annual_rate_str else None
     safe_withdrawal_rate = parse_localized_number(safe_withdrawal_rate_str) if safe_withdrawal_rate_str else 4.0
+    extra_deposit = parse_localized_number(extra_deposit_str) if extra_deposit_str else 0.0
+    
+    extra_deposit_year = None
+    if extra_deposit_year_str:
+        try:
+            extra_deposit_year = int(extra_deposit_year_str)
+            if extra_deposit_year <= 0 or extra_deposit_year > 100:
+                flash("Por favor, insira um ano válido para o aporte extra (entre 1 e 100).", "danger")
+                return redirect(url_for('calculator2_index'))
+        except ValueError:
+            flash("Por favor, insira um ano válido para o aporte extra.", "danger")
+            return redirect(url_for('calculator2_index'))
 
     birth_year = None
     current_year = datetime.date.today().year
@@ -184,7 +218,7 @@ def calculator2_calculate():
             return redirect(url_for('calculator2_index'))
 
     if target_income is None or target_income <= 0:
-        flash("Por favor, insira uma Renda Mensal Futura Desejada válida e maior que 0.", "danger")
+        flash("Por favor, insira uma Renda Alvo válida e maior que 0.", "danger")
         return redirect(url_for('calculator2_index'))
     if annual_rate is None or annual_rate <= 0:
         flash("Por favor, insira uma Taxa de Retorno Anual válida e maior que 0.", "danger")
@@ -194,7 +228,7 @@ def calculator2_calculate():
         return redirect(url_for('calculator2_index'))
 
     try:
-        results = calculate_calculator2(target_income, initial_investment, annual_rate, safe_withdrawal_rate, birth_year, current_year)
+        results = calculate_calculator2(target_income, initial_investment, annual_rate, safe_withdrawal_rate, birth_year, current_year, extra_deposit, extra_deposit_year)
     except ValueError:
         flash("Ocorreu um erro durante o cálculo.", "danger")
         return redirect(url_for('calculator2_index'))
@@ -204,7 +238,9 @@ def calculator2_calculate():
                            initial_investment=session['initial_investment_c2'],
                            annual_rate=session['annual_rate_c2'],
                            safe_withdrawal_rate=session['safe_withdrawal_rate_c2'],
-                           birth_year=session['birth_year_c2'])
+                           birth_year=session['birth_year_c2'],
+                           extra_deposit=session['extra_deposit_c2'],
+                           extra_deposit_year=session['extra_deposit_year_c2'])
 
 # -------------------------------------------------------------
 # Calculator 3: Monthly Savings Potential Calculator
